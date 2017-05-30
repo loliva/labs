@@ -1,0 +1,110 @@
+!!!!CNP
+
+!!!!Sumarizacion
+
+EIGRP
+interface Serial0/0/0 
+ip summary-address eigrp 1 192.168.48.0 255.255.254.0 
+
+OSPF
+router ospf 1 
+area 20 range 192.168.8.0 255.255.252.0 
+
+Sumarizar desde EIGRP2OSPF
+router ospf 1
+summary-address 192.168.48.0 255.255.252.0 
+
+!!!!REDISTRIBUTE
+
+EIGRP
+router eigrp 1
+redistribute ospf 1 metric 10000 100 255 1 1500 
+
+OSPF 
+router ospf 1
+redistribute eigrp 1 subnets 
+
+
+!!!!DISTRIBUTE LIST
+
+Generar acl para match 
+
+ip access-list standard OSPF20-FILTER 
+deny 192.168.8.0 0.0.3.255 
+permit any 
+
+router eigrp 1 
+distribute-list OSPF20-FILTER out ospf 1 => rutas de salidas desde ospf hacia EIGRP
+
+!!!!PREFIX-LIST
+EIGRP => OSPF
+
+ip prefix-list EIGRP-FILTER permit 172.16.0.0/16 le 24 
+
+router ospf 1
+distribute-list prefix EIGRP-FILTER out eigrp 1 
+
+!! ROUTE MAP
+OSPF => EIGRP
+ip access-list standard R3-ACL 
+permit 192.168.25.0 0.0.0.255 
+
+ route-map R3-FILTER deny 10 
+ match ip address R3-ACL 
+ route-map R3-FILTER permit 20 
+ exit
+
+router eigrp 1 
+redistribute ospf 1 route-map R3-FILTER metric 64 100 255 1 1500 
+
+
+! filtrar y setear rutas desde eigrp a ospf ejempl
+
+ip prefix-list R1-PL permit 172.16.12.0/24
+route-map R1-FILTER permit 10 
+match ip address prefix-list R1-PL 
+set metric 25
+set metric-type type-1 
+route-map R1-FILTER permit 20
+
+router ospf 1 
+redistribute eigrp 1 subnets route-map R1-FILTER 
+
+
+!PBR
+
+ip access-list standard PBR-ACL 
+permit 192.168.4.128 0.0.0.127
+
+route-map R3-to-R1 permit 
+match ip address PBR-ACL 
+set ip next-hop 172.16.13.1 
+
+interface s0/1/0 
+ip policy route-map R3-to-R1 
+
+
+DEBUG
+
+ip access-list 1 permit 192.168.4.0 0.0.0.255
+debug ip policy 1
+show route-map
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
