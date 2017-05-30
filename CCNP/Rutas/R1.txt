@@ -1,0 +1,83 @@
+hostname R1
+!
+!
+interface Loopback0
+ ip address 1.1.1.1 255.255.255.255
+!
+interface Loopback48
+ ip address 192.168.48.1 255.255.255.0
+!
+interface Loopback49
+ ip address 192.168.49.1 255.255.255.0
+!
+interface Loopback50
+ ip address 192.168.50.1 255.255.255.0
+!
+interface Loopback51
+ ip address 192.168.51.1 255.255.255.0
+!
+interface Loopback70
+ ip address 192.168.70.1 255.255.255.0
+!
+interface Loopback100
+ ip address 192.168.100.1 255.255.255.0
+!
+interface Loopback200
+ ip address 192.168.200.1 255.255.255.0
+!
+interface Ethernet0/0
+ description Hacia-R4
+ ip address 172.16.14.1 255.255.255.0
+ shutdown
+!
+interface Ethernet0/1
+ no ip address
+ shutdown
+!
+interface Ethernet0/2
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+interface Serial1/0
+ description Hacia-R2
+ ip address 172.16.12.1 255.255.255.0
+ serial restart-delay 0
+ clock rate 128000
+!
+interface Serial1/1
+ description Hacia-R3
+ ip address 172.16.13.1 255.255.255.0
+ serial restart-delay 0
+ clock rate 128000
+!
+interface Serial1/2
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+interface Serial1/3
+ no ip address
+ shutdown
+ serial restart-delay 0
+!
+!
+router eigrp 65001
+ network 1.1.1.1 0.0.0.0
+ network 172.16.13.0 0.0.0.255
+ network 192.168.48.0
+ network 192.168.49.0
+ network 192.168.50.0
+ network 192.168.51.0
+ network 192.168.70.0
+ redistribute rip metric 10000 100 255 1 1500
+!
+router rip
+ version 2
+ redistribute eigrp 65001
+ network 172.16.0.0
+ network 192.168.100.0
+ network 192.168.200.0
