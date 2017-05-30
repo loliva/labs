@@ -1,0 +1,134 @@
+!
+version 12.4
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname Router
+!
+!
+!
+!
+!
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+class-map type inspect match-any TRAFFIC
+ match protocol dns
+ match protocol tcp
+ match protocol udp
+ match protocol http
+ match protocol icmp
+!
+policy-map type inspect INSPECT
+ class type inspect TRAFFIC
+  pass
+!
+!
+!
+zone security INSIDE
+zone security OUTSIDE
+zone security DMZ
+zone-pair security IN_LAN source INSIDE destination OUTSIDE
+ service-policy type inspect INSPECT
+zone-pair security OUT_LAN source OUTSIDE destination INSIDE
+ service-policy type inspect INSPECT
+zone-pair security IN_DMZ source DMZ destination OUTSIDE
+ service-policy type inspect INSPECT
+zone-pair security OUT_DMZ source OUTSIDE destination DMZ
+ service-policy type inspect INSPECT
+zone-pair security LAN2DMZ source INSIDE destination DMZ
+ service-policy type inspect INSPECT
+zone-pair security DMZ2LAN source DMZ destination INSIDE
+ service-policy type inspect INSPECT
+!
+!
+interface FastEthernet0/0
+ ip address 10.0.0.5 255.255.255.252
+ zone-member security INSIDE
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ ip address 10.0.0.1 255.255.255.252
+ zone-member security INSIDE
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface Ethernet0/0/0
+ ip address 10.15.0.1 255.255.255.252
+ zone-member security DMZ
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface Ethernet0/1/0
+ ip address 200.0.0.1 255.255.255.240
+ zone-member security OUTSIDE
+ ip nat outside
+ duplex auto
+ speed auto
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router eigrp 100
+ redistribute static metric 1500 1 255 1 1500 
+ passive-interface Ethernet0/0/0
+ passive-interface Ethernet0/1/0
+ network 10.15.0.0 0.0.0.3
+ network 10.0.0.0 0.0.0.3
+ network 10.0.0.4 0.0.0.3
+ auto-summary
+!
+ip nat inside source list 1 interface Ethernet0/1/0 overload
+ip nat inside source static 10.15.0.2 200.0.0.3 
+ip classless
+ip route 0.0.0.0 0.0.0.0 Ethernet0/1/0 
+!
+ip flow-export version 9
+!
+!
+access-list 1 permit 172.16.15.0 0.0.0.255
+access-list 1 permit 172.16.25.0 0.0.0.255
+access-list 1 permit 172.16.30.0 0.0.0.255
+access-list 1 permit 172.16.95.0 0.0.0.255
+access-list 1 permit 172.16.255.0 0.0.0.255
+!
+no cdp run
+!
+!
+!
+!
+!
+logging 201.0.0.2
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end
+

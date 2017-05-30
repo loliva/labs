@@ -1,0 +1,564 @@
+
+key chain AUT-EIGRP
+ key 1
+  key-string cisco123
+
+interface Loopback0
+ no shutdown
+ ip address 1.1.1.1 255.255.255.255
+ ip ospf 1 area 0
+!
+interface Loopback1
+ no shutdown
+ ip address 11.11.11.11 255.255.255.0
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.13.1 255.255.255.0
+ ip ospf 1 area 3512
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.10.12.1 255.255.255.0
+ ip ospf 1 area 0
+!
+interface Ethernet0/2
+ no shutdown
+ ip address 10.10.14.1 255.255.255.0
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 cisco123
+ ip ospf 1 area 41
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp CCNP1_64
+ !
+ address-family ipv4 unicast autonomous-system 1
+  !
+  af-interface Loopback0
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Loopback1
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/2
+   authentication mode hmac-sha-256 cisco123
+  exit-af-interface
+  !
+  af-interface Ethernet0/0
+   authentication mode md5
+   authentication key-chain AUT-EIGRP
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 1.1.1.1 0.0.0.0
+  network 10.10.12.0 0.0.0.255
+  network 10.10.13.0 0.0.0.255
+  network 10.10.14.0 0.0.0.255
+  network 11.11.11.0 0.0.0.255
+ exit-address-family
+!
+router ospf 1
+ router-id 1.1.1.1
+ area 41 nssa no-summary
+
+key chain EIGRP_32
+ key 1
+  key-string cisco_eigrp
+
+interface Loopback0
+ no shutdown
+ ip address 2.2.2.2 255.255.255.255
+ ip ospf 1 area 0
+!
+interface Loopback1
+ no shutdown
+ ip address 22.22.22.22 255.255.255.0
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.25.2 255.255.255.0
+ ip ospf 1 area 3512
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.10.12.2 255.255.255.0
+ ip ospf 1 area 0
+!
+interface Ethernet0/2
+ no shutdown
+ ip address 10.10.26.2 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp CCNP1_64
+ !
+ address-family ipv4 unicast autonomous-system 1
+  !
+  af-interface Loopback0
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Loopback1
+   passive-interface
+  exit-af-interface
+  !
+  topology base
+   redistribute eigrp 2 metric 10000 100 255 1 1500
+  exit-af-topology
+  network 2.2.2.2 0.0.0.0
+  network 10.10.12.0 0.0.0.255
+  network 10.10.25.0 0.0.0.255
+ exit-address-family
+!
+!
+router eigrp 2
+ network 10.10.26.0 0.0.0.255
+ network 22.22.22.0 0.0.0.255
+ redistribute eigrp 1 metric 10000 100 255 1 1500
+ passive-interface Loopback1
+ eigrp router-id 2.2.2.2
+!
+router ospf 1
+ router-id 2.2.2.2
+ area 672 stub no-summary
+ redistribute connected metric-type 1 subnets route-map Loop1
+
+route-map Loop1 permit 10
+ match interface Loopback1
+
+key chain AUT-EIGRP
+ key 1
+  key-string cisco123
+!
+interface Loopback0
+ no shutdown
+ ip address 3.3.3.3 255.255.255.255
+ ip ospf 1 area 3512
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.13.3 255.255.255.0
+ ip ospf 1 area 3512
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.10.35.3 255.255.255.0
+ ip ospf 1 area 3512
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp CCNP1_64
+ !
+ address-family ipv4 unicast autonomous-system 1
+  !
+  af-interface Loopback0
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/0
+   authentication mode md5
+   authentication key-chain AUT-EIGRP
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 3.3.3.3 0.0.0.0
+  network 10.10.13.0 0.0.0.255
+  network 10.10.35.0 0.0.0.255
+ exit-address-family
+!
+router ospf 1
+ router-id 3.3.3.3
+!
+interface Loopback0
+ no shutdown
+ ip address 4.4.4.4 255.255.255.255
+ ip ospf 1 area 41
+!
+interface Loopback1
+ no shutdown
+ ip address 192.168.1.1 255.255.255.0
+!
+interface Loopback2
+ no shutdown
+ ip address 192.168.2.1 255.255.255.0
+!
+interface Loopback3
+ no shutdown
+ ip address 192.168.3.1 255.255.255.0
+!
+interface Loopback4
+ no shutdown
+ ip address 192.168.4.1 255.255.255.0
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.14.4 255.255.255.0
+ ip ospf message-digest-key 1 md5 cisco123
+ ip ospf 1 area 41
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.10.49.4 255.255.255.0
+ ip ospf message-digest-key 1 md5 cisco123
+ ip ospf 1 area 41
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp CCNP1_64
+ !
+ address-family ipv4 unicast autonomous-system 1
+  !
+  af-interface Loopback0
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Ethernet0/0
+   summary-address 192.168.0.0 255.255.248.0
+   authentication mode hmac-sha-256 cisco123
+  exit-af-interface
+  !
+  af-interface Ethernet0/1
+   summary-address 192.168.0.0 255.255.248.0
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 4.4.4.4 0.0.0.0
+  network 10.10.14.0 0.0.0.255
+  network 10.10.49.0 0.0.0.255
+  network 192.168.1.0
+  network 192.168.2.0
+  network 192.168.3.0
+  network 192.168.4.0
+ exit-address-family
+!
+router ospf 1
+ router-id 4.4.4.4
+ area 41 authentication message-digest
+ area 41 nssa
+ redistribute connected subnets
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 5.5.5.5 255.255.255.255
+ ip ospf 1 area 3512
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.25.5 255.255.255.0
+ ip ospf 1 area 3512
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.10.35.5 255.255.255.0
+ ip ospf 1 area 3512
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp CCNP1_64
+ !
+ address-family ipv4 unicast autonomous-system 1
+  !
+  af-interface Loopback0
+   passive-interface
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 5.5.5.5 0.0.0.0
+  network 10.10.25.0 0.0.0.255
+  network 10.10.35.0 0.0.0.255
+ exit-address-family
+!
+router ospf 1
+ router-id 5.5.5.5
+!
+key chain EIGRP_32
+ key 1
+  key-string cisco_eigrp
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 6.6.6.6 255.255.255.255
+ ip ospf 1 area 672
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.26.6 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+ ip ospf 1 area 672
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.10.67.6 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+ ip ospf 1 area 672
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp 2
+ network 6.6.6.6 0.0.0.0
+ network 10.10.26.0 0.0.0.255
+ network 10.10.67.0 0.0.0.255
+ passive-interface Loopback0
+ eigrp router-id 6.6.6.6
+!
+router ospf 1
+ router-id 6.6.6.6
+ area 672 stub
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 7.7.7.7 255.255.255.255
+ ip ospf 1 area 672
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.78.7 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+ ip ospf priority 255
+ ip ospf 1 area 672
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.10.67.7 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+ ip ospf 1 area 672
+!
+interface Ethernet0/2
+ no shutdown
+ ip address 10.10.71.7 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+ ip ospf 1 area 672
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp 2
+ network 7.7.7.7 0.0.0.0
+ network 10.10.67.0 0.0.0.255
+ network 10.10.71.0 0.0.0.255
+ network 10.10.78.0 0.0.0.255
+ passive-interface Loopback0
+ eigrp router-id 7.7.7.7
+!
+router ospf 1
+ router-id 7.7.7.7
+ area 672 stub
+!
+key chain EIGRP_32
+ key 1
+  key-string cisco_eigrp
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 8.8.8.8 255.255.255.255
+ ip ospf 1 area 672
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.78.8 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+ ip ospf 1 area 672
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.10.81.8 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+ ip ospf 1 area 672
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp 2
+ network 8.8.8.8 0.0.0.0
+ network 10.10.78.0 0.0.0.255
+ network 10.10.81.0 0.0.0.255
+ passive-interface Loopback0
+ eigrp router-id 8.8.8.8
+!
+router ospf 1
+ router-id 8.8.8.8
+ area 672 stub
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 9.9.9.9 255.255.255.255
+ ip ospf 1 area 41
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.49.9 255.255.255.0
+ ip ospf authentication message-digest
+ ip ospf message-digest-key 1 md5 cisco123
+ ip ospf 1 area 41
+!
+interface Ethernet0/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp CCNP1_64
+ !
+ address-family ipv4 unicast autonomous-system 1
+  !
+  af-interface Loopback0
+   passive-interface
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 9.9.9.9 0.0.0.0
+  network 10.10.49.0 0.0.0.255
+ exit-address-family
+!
+router ospf 1
+ router-id 9.9.9.9
+ area 41 nssa
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 10.10.10.10 255.255.255.255
+ ip ospf 1 area 672
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.10.81.10 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+ ip ospf 1 area 672
+ ip ospf cost 1
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.10.71.10 255.255.255.0
+ ip authentication mode eigrp 2 md5
+ ip authentication key-chain eigrp 2 EIGRP_32
+ ip ospf 1 area 672
+ ip ospf cost 11
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp 2
+ network 10.10.10.10 0.0.0.0
+ network 10.10.71.0 0.0.0.255
+ network 10.10.81.0 0.0.0.255
+ passive-interface Loopback0
+ eigrp router-id 10.10.10.10
+!
+router ospf 1
+ router-id 10.10.10.10
+ area 672 stub
+ maximum-paths 1
+!
+
+
+
+⁠⁠⁠access-list 1 permit 10.51.10.0
+
+ 
+
+route-map LEAK permit 10
+
+match ip address 1
+
+ 
+
+interface gx/x
+
+ip summary-address eigrp 1 10.51.0.0 255.255.0.0 leak-map LEAK

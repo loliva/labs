@@ -1,0 +1,76 @@
+topo seguridad
+
+r6 datacenter
+linux tftp
+
+linux vlan 10
+windows vlan 20
+
+R3
+vlan 10 => 192.168.10.0/24
+vlan 20 => 192.168.20.0/24
+vlan admin => 172.31.0.0/24
+
+R2
+vlan 10 => 172.20.0.0/24
+vlan 20 => 172.20.30.0/24
+
+vlsm 	=> 172.31.0.0/24
+
+
+
+ip acs 10.5.1.199
+		10.5.1.0/24
+	gw	10.5.1.1/24
+
+vlan 200 acs
+
+servidor linux tftp vlan 300 => ip 10.6.0.0/24
+
+R4 to R5
+
+200.0.0.0/28 R5 .1
+
+R6 dhcp
+
+dns 8.8.8.8
+
+nat pat r4
+
+protocolo de enrutamiento eigrp
+core 32
+demas 64
+todos los link al core autenticados sha
+
+r4 ntp master autenticado externo y obtienen la hora de r4
+
+s10 core
+
+switch local auth
+router remoto aaa
+R3 y R2 radius
+R6 y R4 tacacas+
+
+banner exec banner mod banner console
+
+todos los dispositivos logs local => buffer del log incrementar al doble del defecto
+
+listas de accesos
+
+windows r2 no puede acceder a facebook
+
+linux abajo de r2 puede hacer managment
+
+windows de r3 enviar ping pero no responder
+
+el managment puede ver http los demas pueden ver https
+
+linux tftp solo dispositivos pueden acceder
+
+por defecto no puede llegar hello los pc
+
+
+
+
+
+

@@ -1,0 +1,74 @@
+
+!
+spanning-tree mode pvst
+!
+class-map type inspect match-any HTTP
+ match protocol http
+ match protocol icmp
+ match protocol dns
+ match protocol tcp
+ match protocol udp
+!
+
+!
+!
+!
+
+!
+!
+interface FastEthernet0/0
+ ip address 172.16.1.1 255.255.255.0
+ zone-member security INSIDE
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ ip address 172.16.2.1 255.255.255.0
+ zone-member security INSIDE
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface Ethernet0/1/0
+ ip address 210.52.52.2 255.255.255.224
+ zone-member security OUTSIDE
+ ip nat outside
+ duplex auto
+ speed auto
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router eigrp 100
+ redistribute static metric 1500 1 255 1 1500 
+ network 172.16.0.0
+ no auto-summary
+!
+ip nat inside source list 1 interface Ethernet0/1/0 overload
+ip classless
+ip route 0.0.0.0 0.0.0.0 Ethernet0/1/0 
+!
+ip flow-export version 9
+!
+!
+access-list 1 permit 192.168.0.0 0.0.63.255
+!
+no cdp run
+!
+!
+!
+!
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end
+

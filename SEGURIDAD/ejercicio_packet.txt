@@ -1,0 +1,107 @@
+!!!!
+ena
+conf t
+hostname ALS1
+
+vlan 15
+vlan 25
+vlan 30
+vlan 95
+
+interface g0/1-2
+	 switchport mode trunk
+	 switchport trunk vlan allowed 1,15,25,30,95
+exit
+
+interface fa0/1
+	switchport access vlan 15
+	switchport mode access
+	switchport nonegotiate
+ 	switchport port-security
+ 	switchport port-security maximum 2
+ 	switchport port-security mac-address sticky 
+ 	switchport port-security violation protect
+ 	spanning-tree portfast
+ 	spanning-tree guard root
+ 	spanning-tree bpduguard enable
+exit
+
+int fa0/13
+ 	switchport access vlan 25
+ 	switchport mode access
+ 	switchport nonegotiate
+ 	switchport port-security
+ 	switchport port-security maximum 2
+ 	switchport port-security mac-address sticky 
+ 	switchport port-security violation protect
+ 	spanning-tree portfast
+ 	spanning-tree guard root
+ 	spanning-tree bpduguard enable
+exit
+
+int range fa0/2-12,fa0/14-24
+ 	switchport mode access
+ 	switchport nonegotiate
+ 	switchport port-security
+ 	switchport port-security maximum 2
+ 	switchport port-security mac-address sticky 
+ 	switchport port-security violation protect
+ 	spanning-tree portfast
+ 	spanning-tree guard root
+ 	spanning-tree bpduguard enable
+exit
+
+
+ena
+conf t
+hostname ALS2
+
+vlan 15
+vlan 25
+vlan 30
+vlan 95
+
+interface g0/1-2
+	 switchport mode trunk
+	 switchport trunk vlan allowed 1,15,25,30,95
+exit
+
+interface fa0/11
+	switchport access vlan 30
+	switchport mode access
+	switchport nonegotiate
+ 	switchport port-security
+ 	switchport port-security maximum 2
+ 	switchport port-security mac-address sticky 
+ 	switchport port-security violation protect
+ 	spanning-tree portfast
+ 	spanning-tree guard root
+ 	spanning-tree bpduguard enable
+exit
+
+int fa0/17
+ 	switchport access vlan 95
+ 	switchport mode access
+ 	switchport nonegotiate
+ 	switchport port-security
+ 	switchport port-security maximum 2
+ 	switchport port-security mac-address sticky 
+ 	switchport port-security violation protect
+ 	spanning-tree portfast
+ 	spanning-tree guard root
+ 	spanning-tree bpduguard enable
+exit
+
+int range fa0/1-10,fa0/12-16,fa0/18-24
+ 	switchport mode access
+ 	switchport nonegotiate
+ 	switchport port-security
+ 	switchport port-security maximum 2
+ 	switchport port-security mac-address sticky 
+ 	switchport port-security violation protect
+ 	spanning-tree portfast
+ 	spanning-tree guard root
+ 	spanning-tree bpduguard enable
+exit
+
+

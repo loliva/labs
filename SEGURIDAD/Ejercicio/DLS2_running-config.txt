@@ -1,0 +1,196 @@
+!
+version 12.2
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname DLS2
+!
+!
+!
+!
+!
+!
+!
+ip routing
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree vlan 30,95,100 priority 4096
+!
+!
+!
+!
+!
+!
+interface Port-channel 10
+ no switchport
+ ip address 10.0.1.2 255.255.255.252
+!
+interface FastEthernet0/1
+!
+interface FastEthernet0/2
+ no switchport
+ ip address 10.0.0.2 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/3
+!
+interface FastEthernet0/4
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+ ip dhcp snooping trust
+ switchport access vlan 100
+ switchport mode access
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+ no switchport
+ no ip address
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/24
+ no switchport
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ ip dhcp snooping trust
+ switchport trunk native vlan 255
+ switchport trunk allowed vlan 15,25,30,95,100,255
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree guard root
+!
+interface GigabitEthernet0/2
+ ip dhcp snooping trust
+ switchport trunk native vlan 255
+ switchport trunk allowed vlan 15,25,30,95,100,255
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree guard root
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan15
+ mac-address 00d0.ff16.4001
+ ip address 172.16.15.3 255.255.255.0
+ standby 15 ip 172.16.15.1
+ standby 15 priority 150
+ standby 15 preempt
+!
+interface Vlan25
+ mac-address 00d0.ff16.4002
+ ip address 172.16.25.3 255.255.255.0
+ standby 25 ip 172.16.25.1
+ standby 25 priority 150
+ standby 25 preempt
+!
+interface Vlan30
+ mac-address 00d0.ff16.4003
+ ip address 172.16.30.3 255.255.255.0
+ ip helper-address 172.16.100.254
+ standby 30 ip 172.16.30.1
+ standby 30 preempt
+!
+interface Vlan95
+ mac-address 00d0.ff16.4004
+ ip address 172.16.95.3 255.255.255.0
+ ip helper-address 172.16.100.254
+ standby 95 ip 172.16.95.1
+ standby 95 priority 150
+ standby 95 preempt
+!
+interface Vlan100
+ mac-address 00d0.ff16.4005
+ ip address 172.16.100.1 255.255.255.0
+!
+interface Vlan255
+ mac-address 00d0.ff16.4006
+ ip address 172.16.255.3 255.255.255.0
+ standby 255 ip 172.16.255.1
+ standby 255 priority 150
+ standby 255 preempt
+!
+router eigrp 100
+ passive-interface GigabitEthernet0/1
+ passive-interface GigabitEthernet0/2
+ network 172.16.15.0 0.0.0.255
+ network 172.16.25.0 0.0.0.255
+ network 172.16.30.0 0.0.0.255
+ network 172.16.95.0 0.0.0.255
+ network 172.16.100.0 0.0.0.255
+ network 10.0.0.0 0.0.0.3
+ auto-summary
+!
+ip classless
+!
+ip flow-export version 9
+!
+!
+!
+!
+!
+!
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end
+

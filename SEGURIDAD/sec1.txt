@@ -1,0 +1,144 @@
+apunte seguridad 1
+
+seguridad administrativa
+
+line con 0 
+password cisco
+login
+line vty 0 4 
+password cisco
+login
+line aux 0
+password cisco
+login
+
+enable secret cisco 
+
+
+username luis password cisco => password desencriptable
+username luis secret cisco => encriptado por md5 => $1$
+
+login block-for 15 attempts 5 within 60 => 5 intentos fallidos de login durante 60 segundos bloquea por 15
+
+ip access-list standard PERMIT_LOGIN
+permit 192.168.0.10
+permit 192.168.0.20
+exit
+
+login quiet-mode access-class PERMIT_LOGIN
+login delay 10
+login on-success log
+login on-failure log
+
+verificar => show login
+verificar login fallidos => show login failures
+
+
+banner { motd | exec | login} & mensaje &
+
+
+SSH
+ip domain-name dominio.com
+crypto key generate rsa general-keys
+line vty 0 4 
+login local 
+transport input ssh
+
+ip ssh version 2
+ip ssh time-out 60
+ip ssh authentication-retries 2
+
+
+Privilegios
+
+privilege exec level 10 reload
+enable secret level 10 cisco10
+username JR-ADMIN privilege 10 secret cisco10
+
+vistas
+
+
+aaa new-model
+!genera los permisos
+parser view {NOMBRE_PRIVILEGIOS}
+secret password
+commands lista include|exclude comando
+
+!genera la vista
+parser view {NOMBRE_VISTA} superview
+secret password
+commands lista include|exclude comando
+
+depuracion
+
+enable view NOMBRE_VISTA
+enable view => vista root
+
+show parser view all
+
+
+! password recovery
+no service password-recovery
+
+!syslog
+loggin host x.x.x.x
+logging trap nivel 0-7
+logging buffered 4096 (default)
+logging monitor
+
+
+!NTP (configurar antes dns ip name-server 8.8.8.8)
+ntp master 1
+ntp server ntp.shoa.cl
+ntp authenticate
+ntp authentication-key 1 md5 clave
+ntp trusted-key 1
+
+!AUTOSECURE
+
+!AAA LOCAL
+aaa new-model
+aaa authentication login default local-case
+aaa local authentication attempts max-fail 10
+!
+
+aaa authentication login default local-case enable => enable auth
+aaa authentication login TELNET-LOGIN local-case => con perfiles
+line vty 0 4 
+login authentication TELNET LOGIN
+
+
+show aaa local user lockout
+
+!Configuracion de Tacacs y radius
+tacacs-server host 192.168.1.101 single-connection
+tacacs-server key clave
+
+radius-server host 192.168.1.101
+radius-server key clave
+
+conf autenticacion contra tacacs
+
+aaa authentication login default group tacacs+ group radius local-case => primer tacacs despues radius despues local
+
+debug aaa authentication
+
+!AAA Authorization types
+
+aaa authorization exec default group tacacs+ => autoriza modo exec desde tacacs
+aaa authorization network default group tacacs+ => autoriza network desde tacacs
+
+!accounting example
+aaa accouting exec default start-stop group tacacs+ => accouting sobre taccas+
+aaa accouting network default start-stop group tacacs+
+
+
+!nat salida por defecto
+
+ip nat inside source list 1 interface IF overload
+!
+access-list 1 permit xxx.xxx.xxx.xxx wildcard 
+
+nat inside (IF LAN)
+nat outside (IF WAN)
+
