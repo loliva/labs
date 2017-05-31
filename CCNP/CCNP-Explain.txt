@@ -93,7 +93,103 @@ show route-map
 
 
 
+ejercicio 1
 
+ip access-list standard FILTRO
+ deny   192.168.24.0 0.0.7.255
+ deny   192.168.48.0 0.0.1.255
+ permit any
+
+router ospf 1
+ redistribute eigrp 65001 subnets
+ network 172.16.34.0 0.0.0.255 area 0
+ distribute-list FILTRO out
+!
+
+ejercicio 2 desde ospf a eigrp por redistribucion
+
+ip access-list standard FILTRO2
+ permit 172.16.101.0 0.0.0.255
+ permit 172.16.104.0 0.0.1.255
+
+
+route-map HACIA-EIGRP deny 10
+ match ip address FILTRO2
+!
+route-map HACIA-EIGRP permit 20
+
+
+router eigrp 65001
+ network 3.3.3.3 0.0.0.0
+ network 172.16.13.0 0.0.0.255
+ network 172.16.23.0 0.0.0.255
+ redistribute ospf 1 metric 10000 100 255 1 1500 route-map HACIA-EIGRP
+!
+
+ejercicio 3 => prefix-list
+
+redistribute ospf 1 route-map HACIA-EIGRP => cambiar metrica del redistribute dentro del routemap
+ 
+
+ip prefix-list METRIC1 SEQ 5 permit 172.16.102.0/23 ge 25 le 26
+ip prefix-list METRIC2 SEQ 10 permit 172.16.106.0/23 ge 29 le 30
+
+route-map HACIA-EIGRP permit 20
+match ip address prefix-list METRIC1
+set metric 5000 100 255 1 1500
+route-map HACIA-EIGRP permit 25
+match ip address prefix-list METRIC2
+set metric 8000 50 255 1 1500
+route-map HACIA-EIGRP permit 30
+set metric 10000 100 255 1 1500
+router-map HACIA-EIGRP permit 35
+
+-----
+letra d
+
+ip access-list standard loop50
+permit 192.168.50.0 0.0.0.255
+exit
+
+route-map hacia-ospf permit 10
+match ip address loop50 loop51
+set metric 50
+set metric type 1
+exit
+route-map hacia-ospf permit 20
+
+router ospf 1
+redistribute eigrp 65001 route-map hacia-ospf
+exit
+
+
+
+
+------------------
+h
+
+ip access-list extended PBR
+permit 172.16.107.1 0.0.0.1 192.168.70.1 0.0.0.1
+
+route-map RUTA-NO-OPTIMA permit 10
+match ip address PBR
+set ip next-hop 172.16.23.2
+exit
+
+Rutas de entradas hacia un mismo router
+
+E1 => verifica costo de interfaz ospf
+E2 => no verifica costo de interfaz
+
+
+
+distance para ruterar por defecto
+desde rip a ospf
+router ospf 1
+distance 121 ... ACL
+
+
+"""""
 
 
 
