@@ -1,0 +1,597 @@
+R1(config-router)#do sh run
+
+
+interface Loopback0
+ ip address 1.1.1.1 255.255.255.0
+!
+interface Ethernet0/0
+ ip address 10.1.12.1 255.255.255.0
+!
+interface Ethernet0/1
+ ip address 10.1.13.1 255.255.255.0
+!
+interface Ethernet0/2
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+!
+router eigrp 1
+ network 1.0.0.0
+ network 10.0.0.0
+!
+router bgp 1
+ bgp router-id 1.1.1.1
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 2.2.2.2 remote-as 1
+ neighbor 2.2.2.2 password class
+ neighbor 2.2.2.2 update-source Loopback0
+ neighbor 10.1.13.3 remote-as 3
+ !
+ address-family ipv4
+  neighbor 2.2.2.2 activate
+  neighbor 10.1.13.3 activate
+  neighbor 10.1.13.3 route-map CIEN out
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+access-list 10 permit 200.1.0.0 0.0.7.255
+!
+route-map CIEN permit 10
+ match ip address 10
+ set metric 100
+!
+route-map CIEN permit 20
+ continue
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+alias exec cc conf t
+alias exec sir sh ip route
+alias exec sib show ip int brie
+alias exec srb show running-config | b ^router bgp
+alias exec srr show running-config | b ^router rip
+alias exec sro show running-config | b ^router ospf
+alias exec sri show running-config | b ^router isis
+alias exec sre show running-config | b ^router eigrp
+alias exec sre6 show running-config | begin ipv6 router eigrp
+alias exec sro6 show  running-config | b ipv6 router ospf
+alias exec srig show running-config interface gigabitEthernet
+alias exec srif show running-config interface fastEthernet
+alias exec srie show running-config interface ethernet
+alias exec sris show running-config interface serial
+alias exec sril show running-config interface loopback
+alias exec srit show running-config interface tunnel
+alias exec sien sh ip eigrp neighbors
+alias exec sien6 show ipv6 eigrp neighbors
+alias exec sio show ip ospf interface
+alias exec sion show ip ospf neighbor
+alias exec cio clear ip ospf proce
+alias exec cir clear ip route *
+alias exec cib clear ip bgp *
+alias exec cibs clear ip bgp * soft
+alias exec sl show ip bgp vpnv4  all labels
+alias exec si show ip bgp
+alias exec z ping 255.255.255.255
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input all
+!
+!
+end
+#########################################
+
+
+
+
+r2
+
+R2(config-router)#do sh run
+Building configuration...
+
+Current configuration : 3625 bytes
+!
+! Last configuration change at 19:01:13 CET Mon Jun 19 2017
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+clock timezone CET 1 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 2.2.2.2 255.255.255.0
+!
+interface Loopback200
+ ip address 200.1.0.1 255.255.255.0 secondary
+ ip address 200.1.2.1 255.255.255.0 secondary
+ ip address 200.1.3.1 255.255.255.0 secondary
+ ip address 200.1.4.1 255.255.255.0 secondary
+ ip address 200.1.5.1 255.255.255.0 secondary
+ ip address 200.1.6.1 255.255.255.0 secondary
+ ip address 200.1.7.1 255.255.255.0 secondary
+ ip address 200.1.1.1 255.255.255.0
+!
+interface Ethernet0/0
+ ip address 10.1.12.2 255.255.255.0
+!
+interface Ethernet0/1
+ ip address 10.1.24.2 255.255.255.0
+!
+interface Ethernet0/2
+ ip address 10.1.23.2 255.255.255.0
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+!
+router eigrp 1
+ network 2.0.0.0
+ network 10.0.0.0
+!
+router bgp 1
+ bgp router-id 2.2.2.2
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 1.1.1.1 remote-as 1
+ neighbor 1.1.1.1 password class
+ neighbor 1.1.1.1 update-source Loopback0
+ neighbor 10.1.23.3 remote-as 3
+ neighbor 10.1.24.4 remote-as 4
+ !
+ address-family ipv4
+  aggregate-address 200.1.0.0 255.255.248.0 summary-only
+  redistribute connected route-map REDDOCIENTOS
+  neighbor 1.1.1.1 activate
+  neighbor 10.1.23.3 activate
+  neighbor 10.1.23.3 route-map CIEN out
+  neighbor 10.1.24.4 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+access-list 10 permit 200.1.0.0 0.0.7.255
+!
+route-map CIEN permit 10
+ match ip address 10
+ set metric 2000
+!
+route-map CIEN permit 20
+
+!
+route-map REDDOCIENTOS permit 10
+ match interface Loopback200
+route-map REDDOCIENTOS permit 20
+
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+alias exec cc conf t
+alias exec sir sh ip route
+alias exec sib show ip int brie
+alias exec srb show running-config | b ^router bgp
+alias exec srr show running-config | b ^router rip
+alias exec sro show running-config | b ^router ospf
+alias exec sri show running-config | b ^router isis
+alias exec sre show running-config | b ^router eigrp
+alias exec sre6 show running-config | begin ipv6 router eigrp
+alias exec sro6 show  running-config | b ipv6 router ospf
+alias exec srig show running-config interface gigabitEthernet
+alias exec srif show running-config interface fastEthernet
+alias exec srie show running-config interface ethernet
+alias exec sris show running-config interface serial
+alias exec sril show running-config interface loopback
+alias exec srit show running-config interface tunnel
+alias exec sien sh ip eigrp neighbors
+alias exec sien6 show ipv6 eigrp neighbors
+alias exec sio show ip ospf interface
+alias exec sion show ip ospf neighbor
+alias exec sion6 show ipv6 ospf neighbor
+alias exec cio clear ip ospf proce
+alias exec cir clear ip route *
+alias exec cib clear ip bgp *
+alias exec cibs clear ip bgp * soft
+alias exec cbv clear bgp vpnv4 unicast *
+alias exec sl show ip bgp vpnv4  all labels
+alias exec si show ip bgp
+alias exec sil show ip bgp ipv4 unicast labels
+alias exec sir6 show  ipv6 route
+alias exec z ping 255.255.255.255
+alias exec sfp show  frame-relay pvc | i STATUS
+alias exec sfm show frame-relay map
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input all
+!
+!
+end
+
+#######################################
+
+
+
+R3
+
+
+R3#sh run
+Building configuration...
+
+Current configuration : 2522 bytes
+!
+! Last configuration change at 18:51:56 CET Mon Jun 19 2017
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+clock timezone CET 1 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ ip address 10.1.34.3 255.255.255.0
+!
+interface Ethernet0/1
+ ip address 10.1.13.3 255.255.255.0
+!
+interface Ethernet0/2
+ ip address 10.1.23.3 255.255.255.0
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+router bgp 3
+ bgp log-neighbor-changes
+ neighbor 10.1.13.1 remote-as 1
+ neighbor 10.1.23.2 remote-as 1
+ neighbor 10.1.34.4 remote-as 4
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+alias exec cc conf t
+alias exec sir sh ip route
+alias exec sib show ip int brie
+alias exec srb show running-config | b ^router bgp
+alias exec srr show running-config | b ^router rip
+alias exec sro show running-config | b ^router ospf
+alias exec sri show running-config | b ^router isis
+alias exec sre show running-config | b ^router eigrp
+alias exec sre6 show running-config | begin ipv6 router eigrp
+alias exec sro6 show  running-config | b ipv6 router ospf
+alias exec srig show running-config interface gigabitEthernet
+alias exec srif show running-config interface fastEthernet
+alias exec srie show running-config interface ethernet
+alias exec sris show running-config interface serial
+alias exec sril show running-config interface loopback
+alias exec srit show running-config interface tunnel
+alias exec sien sh ip eigrp neighbors
+alias exec sien6 show ipv6 eigrp neighbors
+alias exec sio show ip ospf interface
+alias exec sion show ip ospf neighbor
+alias exec sion6 show ipv6 ospf neighbor
+alias exec cio clear ip ospf proce
+alias exec cir clear ip route *
+alias exec cib clear ip bgp *
+alias exec cibs clear ip bgp * soft
+alias exec cbv clear bgp vpnv4 unicast *
+alias exec sl show ip bgp vpnv4  all labels
+alias exec si show ip bgp
+alias exec sil show ip bgp ipv4 unicast labels
+alias exec sir6 show  ipv6 route
+alias exec z ping 255.255.255.255
+alias exec sfp show  frame-relay pvc | i STATUS
+alias exec sfm show frame-relay map
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input all
+!
+!
+end
+
+
+
+###########################
+
+
+
+r4
+
+R4(config-router)#do sh run
+Building configuration...
+
+Current configuration : 2599 bytes
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R4
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+clock timezone CET 1 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ ip address 10.1.34.4 255.255.255.0
+!
+interface Ethernet0/1
+ ip address 10.1.24.4 255.255.255.0
+!
+interface Ethernet0/2
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+!
+router bgp 4
+ bgp log-neighbor-changes
+ neighbor 10.1.24.2 remote-as 1
+ neighbor 10.1.34.3 remote-as 3
+ neighbor 10.1.34.3 route-map CIEN out
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+access-list 10 permit 200.1.0.0 0.0.7.255
+!
+route-map CIEN permit 10
+ match ip address 10
+ set metric 1
+!
+route-map CIEN permit 20
+ continue
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+alias exec cc conf t
+alias exec sir sh ip route
+alias exec sib show ip int brie
+alias exec srb show running-config | b ^router bgp
+alias exec srr show running-config | b ^router rip
+alias exec sro show running-config | b ^router ospf
+alias exec sri show running-config | b ^router isis
+alias exec sre show running-config | b ^router eigrp
+alias exec sre6 show running-config | begin ipv6 router eigrp
+alias exec sro6 show  running-config | b ipv6 router ospf
+alias exec srig show running-config interface gigabitEthernet
+alias exec srif show running-config interface fastEthernet
+alias exec srie show running-config interface ethernet
+alias exec sris show running-config interface serial
+alias exec sril show running-config interface loopback
+alias exec srit show running-config interface tunnel
+alias exec sien sh ip eigrp neighbors
+alias exec sien6 show ipv6 eigrp neighbors
+alias exec sio show ip ospf interface
+alias exec sion show ip ospf neighbor
+alias exec sion6 show ipv6 ospf neighbor
+alias exec cio clear ip ospf proce
+alias exec cir clear ip route *
+alias exec cib clear ip bgp *
+alias exec cibs clear ip bgp * soft
+alias exec cbv clear bgp vpnv4 unicast *
+alias exec sl show ip bgp vpnv4  all labels
+alias exec si show ip bgp
+alias exec sil show ip bgp ipv4 unicast labels
+alias exec sir6 show  ipv6 route
+alias exec z ping 255.255.255.255
+alias exec sfp show  frame-relay pvc | i STATUS
+alias exec sfm show frame-relay map
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input all
+!
+!
+end
+
+
+
+
+
