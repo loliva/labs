@@ -1,0 +1,141 @@
+!
+! Last configuration change at 18:29:02 CLT Sat Jun 24 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+aqm-register-fnf
+!
+!
+no aaa new-model
+clock timezone CLT -4 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 1.1.1.1 255.255.255.0
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 10.1.12.1 255.255.255.0
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.1.13.1 255.255.255.0
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+!
+router eigrp 1
+ network 1.1.1.1 0.0.0.0
+ network 10.1.12.0 0.0.0.255
+ passive-interface Ethernet0/1
+!
+router bgp 1
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 2.2.2.2 remote-as 1
+ neighbor 2.2.2.2 ebgp-multihop 2
+ neighbor 2.2.2.2 password class
+ neighbor 2.2.2.2 update-source Loopback0
+ neighbor 10.1.13.3 remote-as 3
+ !
+ address-family ipv4
+  neighbor 2.2.2.2 activate
+  neighbor 10.1.13.3 activate
+  neighbor 10.1.13.3 route-map SET_METRIC_100 out
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map SET_METRIC_100 permit 10
+ match ip address 10
+ set metric 100
+ set as-path prepend 1 1 1
+!
+route-map SET_METRIC_100 permit 20
+!
+!
+access-list 10 permit 200.1.0.0 0.0.7.255
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end
