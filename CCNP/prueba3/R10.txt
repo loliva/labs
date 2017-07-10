@@ -1,0 +1,145 @@
+!
+! Last configuration change at 15:44:53 CLT Wed Jun 21 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+clock timezone CLT -4 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 10.10.10.10 255.255.255.255
+ ipv6 enable
+ ospfv3 2 ipv6 area 0
+ ospfv3 1 ipv4 area 0
+!
+interface Loopback100
+ no shutdown
+ ip address 198.0.0.65 255.255.255.192
+ ipv6 enable
+ ospfv3 network point-to-point
+ ospfv3 1 ipv4 area 0
+!
+interface Loopback101
+ no shutdown
+ ip address 197.0.0.1 255.255.255.0
+ ipv6 enable
+ ospfv3 network point-to-point
+ ospfv3 1 ipv4 area 0
+!
+interface Ethernet0/0
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 10.9.10.10 255.255.255.0
+ ipv6 enable
+ ospfv3 2 ipv6 area 0
+ ospfv3 1 ipv4 area 0
+!
+interface Ethernet0/2
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/3
+ no shutdown
+ no ip address
+ shutdown
+!
+router ospfv3 1
+ !
+ address-family ipv4 unicast
+ exit-address-family
+!
+router ospfv3 2
+ !
+ address-family ipv6 unicast
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end

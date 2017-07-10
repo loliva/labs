@@ -1,0 +1,122 @@
+!
+! Last configuration change at 15:44:56 CLT Wed Jun 21 2017
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname ISP3-R8
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no aaa new-model
+clock timezone CLT -4
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+ip source-route
+!
+!
+!
+!
+ip cef
+ipv6 unicast-routing
+no ipv6 traffic interface-statistics
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 200.8.9.8 255.255.255.0
+ ipv6 address 2001:8:9::8/64
+!
+interface Ethernet0/1
+ no shutdown
+ ip address 200.5.8.8 255.255.255.0
+ ipv6 address 2001:5:8::8/64
+!
+interface Ethernet0/2
+ no shutdown
+ ip address 200.6.8.8 255.255.255.0
+ ipv6 address 2001:6:8::8/64
+!
+interface Ethernet0/3
+ no shutdown
+ ip address 200.7.8.8 255.255.255.0
+ ipv6 address 2001:7:8::8/64
+!
+router bgp 300
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 2001:5:8::5 remote-as 100
+ neighbor 2001:6:8::6 remote-as 100
+ neighbor 2001:7:8::7 remote-as 200
+ neighbor 2001:8:9::9 remote-as 1999
+ neighbor 200.5.8.5 remote-as 100
+ neighbor 200.6.8.6 remote-as 100
+ neighbor 200.7.8.7 remote-as 200
+ neighbor 200.8.9.9 remote-as 1999
+ !
+ address-family ipv4
+  no synchronization
+  neighbor 200.5.8.5 activate
+  neighbor 200.6.8.6 activate
+  neighbor 200.7.8.7 activate
+  neighbor 200.8.9.9 activate
+  no auto-summary
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor 2001:5:8::5 activate
+  neighbor 2001:6:8::6 activate
+  neighbor 2001:7:8::7 activate
+  neighbor 2001:8:9::9 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+!
+exception data-corruption buffer truncate
+end

@@ -1,0 +1,135 @@
+!
+! Last configuration change at 18:37:54 CLT Wed Jun 21 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+clock timezone CLT -4 0
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip cef
+ipv6 unicast-routing
+ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ no shutdown
+ ip address 2.2.2.2 255.255.255.255
+ ip ospf 1 area 0
+ ipv6 address 2001:2:2::2/128
+ ipv6 enable
+!
+interface Ethernet0/0
+ no shutdown
+ ip address 200.2.6.2 255.255.255.0
+ ipv6 address 2001:2:6::2/64
+!
+interface Ethernet0/1
+ no shutdown
+ no ip address
+ shutdown
+!
+interface Ethernet0/2
+ no shutdown
+ ip address 10.2.4.2 255.255.255.0
+ ip ospf 1 area 0
+ ipv6 enable
+!
+interface Ethernet0/3
+ no shutdown
+ ip address 10.2.3.2 255.255.255.0
+ ip ospf 1 area 0
+ ipv6 enable
+!
+!
+router eigrp EIGRP
+ !
+ address-family ipv6 unicast autonomous-system 1999
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router ospf 1
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map LOCAL permit 10
+ set local-preference 120
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!
+end
