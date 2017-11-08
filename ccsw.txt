@@ -1,0 +1,174 @@
+vlan 10
+name Administacion 
+vlan 20
+name SSID_GUEST 
+vlan 30
+name Contabilidad 
+vlan 40
+name RRHH 
+vlan 50
+name Bodega 
+vlan 60
+name POS 
+vlan 70
+name Servidores 
+vlan 80
+name Empleados 
+vlan 1038
+name nativa
+
+interface vlan 10
+ip address 172.16.0.2 255.255.255.0
+description Administracion
+standby version 2
+standby 101 ip 172.16.0.254
+standby 101 preempt
+standby 101 timers 1 3 
+standby 101 priority 100
+no shut
+
+
+interface vlan 20
+ip address 172.20.0.2 255.255.255.0
+DESCRIPTION SSID_Guest
+vrrp 1 ip 172.20.0.254
+vrrp 1 pri 150
+no shut
+
+
+
+interface vlan 30
+ip address 172.16.1.1 255.255.255.128
+no shut
+
+
+
+interface vlan 40
+ip address 172.16.1.129 255.255.255.192
+description RRHH
+standby version 2
+standby 4081 ip 172.16.1.190
+standby 4081 preempt
+standby 4081 timers 1 3 
+standby 4081 priority 100
+no shut
+
+
+
+interface vlan 50
+ip address 172.16.1.194 255.255.255.240
+description Bodega
+standby version 2
+standby 501 ip 172.16.1.206
+standby 501 preempt
+standby 501 timers 1 3 
+standby 501 priority 100
+no shut
+
+
+
+interface vlan 60
+ip address 172.16.2.2 255.255.255.240
+description POS
+standby 18 ip 172.16.2.14
+standby 18 preempt
+standby 18 timers 1 3 
+standby 18 priority 150
+
+no shut
+
+
+
+interface vlan 70
+ip address 172.19.0.2 255.255.255.0
+DESCRIPTION Servidores
+vrrp 30 ip 172.19.0.254
+vrrp 30 pri 150
+no shut
+
+
+
+interface vlan 80
+ip address 172.16.3.2 255.255.255.0
+description POS
+standby 241 ip 172.16.3.254
+standby 241 preempt
+standby 241 timers 1 3 
+standby 241 priority 150
+
+no shut
+
+
+inter vlan 10
+ip helper-address 172.19.0.100
+
+inter vlan 20
+ip helper-address 172.19.0.100
+.
+inter vlan 30
+ip helper-address 172.19.0.100
+
+inter vlan 40
+ip helper-address 172.19.0.100
+
+inter vlan 50
+ip helper-address 172.19.0.100
+
+inter vlan 60
+ip helper-address 172.19.0.100
+
+inter vlan 70
+ip helper-address 172.19.0.100
+
+inter vlan 80
+ip helper-address 172.19.0.100
+
+
+
+
+
+interface Ethernet0/0
+switch acc vlan 40
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+
+spanni mst conf
+rev 0
+instance 1 vlan 10,30,50,70
+instance 2 vlan 20,40,60,80
+exit
+
+inter vlan 30
+description Contabilidad
+ ip address 172.16.1.2 255.255.255.128
+ ip helper-address 172.19.0.100
+ glbp 1 ip 172.16.1.126
+ glbp 1 timers 1 3
+ glbp 1 preempt
+
+
+
+Switch(config)#ip sla 10
+Switch(config-ip-sla)#icmp-echo 192.168.70.1
+Switch(config-ip-sla)#frequency 5
+
+Switch(config-ip-sla)#exit
+Switch(config)#ip sla schedule 10 life forever start-time now
+
+Switch(config)#track 1 ip sla 10 reachability
+
+Switch(config)#interface vlan 10
+Switch(config)#ip address 192.168.1.3 255.255.255.0
+Switch(config)#standby 1 priority 200
+Switch(config)#stabdby 1 track 1 decrement 50
+Switch(config)#no shutdown
+
+
+Switch(config)# errdisable recovery cause psecure-violation
+Switch(config)# errdisable recovery interval 300
+
+
+
